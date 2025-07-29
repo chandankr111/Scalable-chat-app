@@ -1,16 +1,16 @@
 import { test, describe, expect } from "bun:test";
 
 const BACKEND_URL1 = "ws://localhost:8080"
-// const BACKEND_URL2 = "ws://localhost:8081"
+const BACKEND_URL2 = "ws://localhost:8081"
 
 describe("Chat application", () => {
     
     test("Message sent from room 1 reaches another participant in room 1", async() => {
         const ws1 = new WebSocket(BACKEND_URL1)
-        const ws2 = new WebSocket(BACKEND_URL1)
-        let count = 0;
+        const ws2 = new WebSocket(BACKEND_URL2)
+
        await new Promise<void>((resolve, reject) => {
-        let count = 0;
+            let count = 0;
             ws1.onopen = () => {
                 count = count + 1;
                 if (count == 2) {
@@ -38,13 +38,10 @@ describe("Chat application", () => {
 
         await new Promise<void>((resolve) => {
             ws2.onmessage = ({data}) => {
-                
-                    const parsedData = JSON.parse(data);
+                const parsedData = JSON.parse(data);
                 expect(parsedData.type == "chat")
                 expect(parsedData.message == "Hi there")
-                resolve();
-                
-               
+                resolve()
             }
     
             ws1.send(JSON.stringify({
